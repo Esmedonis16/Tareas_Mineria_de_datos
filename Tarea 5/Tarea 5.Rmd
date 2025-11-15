@@ -1,0 +1,97 @@
+---
+title: "Tarea 5"
+author: "Linda Morales"
+date: "2025-11-15"
+output: html_document
+---
+
+## **HEC_TIPAGRE** → Tipo de agresión sufrida por la víctima
+
+Es interesante predecir esta variable porque podemos identificar **perfiles de víctimas** más propensas a sufrir cierto tipo de agresión y ayudar a orientar políticas públicas o prevención.
+
+Por ejemplo:
+
+-   ¿Las mujeres jóvenes con estudios universitarios tienen mayor riesgo de violencia psicológica?
+
+-   ¿La edad o condición laboral influye en el tipo de agresión?
+
+```{r}
+# Librerías
+install.packages("rpart")
+install.packages("rpart.plot")
+install.packages("arules", type ="binary")
+library(arules)
+install.packages("readxl")
+library(readxl)
+search()
+ls("package:readxl")
+library(rpart)
+library(rpart.plot)
+
+data <- read_excel("C:/Users/DELL/Downloads/base-de-datos-violencia-intrafamiliar-ano-2024_v3.xlsx")
+```
+
+```{r}
+# Crear variable: universitaria (1 = nivel universitario o más, 0 = no)
+data$universitaria <- ifelse(data$VIC_ESCOLARIDAD >= 51, 1, 0)
+data$universitaria
+
+# Crear variable: agresor_trabaja (1 = sí trabaja, 0 = no)
+data$agresor_trabaja <- ifelse(data$AGR_TRABAJA == 1, 1, 0)
+
+# Verificar que se crearon correctamente
+data.frame(1:ncol(data), colnames(data))
+
+# Convertir variables a factor (importante para rpart)
+data$HEC_TIPAGRE <- as.factor(data$HEC_TIPAGRE)
+data$VIC_SEXO <- as.factor(data$VIC_SEXO)
+data$VIC_TRABAJA <- as.factor(data$VIC_TRABAJA)
+data$AGR_TRABAJA <- as.factor(data$AGR_TRABAJA)
+
+
+# Crear variable agrupada
+data$tipo_general <- ifelse(substr(data$HEC_TIPAGRE, 1, 1) == "1", "Fisica",
+                       ifelse(substr(data$HEC_TIPAGRE, 1, 1) == "2", "Psicologica", "Sexual"))
+data$tipo_general <- as.factor(data$tipo_general)
+
+# Árbol usando la variable agrupada
+arbol_tipo_general <- rpart(tipo_general ~ 
+                 VIC_SEXO +
+                 VIC_EDAD +
+                 VIC_TRABAJA +
+                 VIC_ESCOLARIDAD +
+                 AGR_TRABAJA +
+                 AGR_ESCOLARIDAD +
+                 universitaria,
+               data = data, method = "class")
+
+rpart.plot(arbol_tipo_general, type = 2, extra = 104, under = TRUE,
+           fallen.leaves = TRUE, box.palette = "BuGn",
+           main="Tipo general de Agresión", cex=0.9)
+
+
+```
+
+```{r}
+# Crear persona ficticia
+persona <- data.frame(
+  VIC_SEXO = as.factor(2),          # Mujer
+  VIC_EDAD = 23,
+  VIC_TRABAJA = as.factor(2),       # No trabaja
+  VIC_ESCOLARIDAD = 51,             # Universitario
+  AGR_TRABAJA = as.factor(1),       # Agresor sí trabaja
+  AGR_ESCOLARIDAD = 44,             # Cuarto diversificado
+  universitaria = 1
+)
+
+# Predecir con el árbol correcto
+resultado <- predict(arbol_tipo_general, persona, type = "prob")
+resultado
+
+```
+
+El modelo de árbol de decisión indica que el tipo general de agresión más probable para el caso simulado es **violencia psicológica (54.3%)**, frente a un 45.7% de probabilidad de violencia física.
+
+Esto sugiere que las **mujeres jóvenes con educación universitaria y sin empleo** presentan una mayor probabilidad de sufrir agresión de tipo psicológica.
+
+En general, el árbol permite identificar que **la condición laboral (`VIC_TRABAJA`)** y **el nivel educativo (`VIC_ESCOLARIDAD`)** son variables con alta influencia en el tipo de agresión reportada.

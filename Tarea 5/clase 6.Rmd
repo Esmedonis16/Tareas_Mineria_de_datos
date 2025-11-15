@@ -1,0 +1,116 @@
+---
+title: "Clase 6"
+author: "Linda Morales"
+date: "2025-11-12"
+output: pdf_document
+---
+
+```{r}
+install.packages("rpart")
+install.packages("rpart.plot")
+install.packages("arules", type ="binary")
+library(arules)
+install.packages("readxl")
+library(readxl)
+search()
+ls("package:readxl")
+install.packages("genero")
+library(genero)
+library(rpart)
+library(rpart.plot)
+```
+
+```{r}
+data <- read_excel("C:/Users/DELL/Downloads/base-de-datos-violencia-intrafamiliar-ano-2024_v3.xlsx")
+
+data$ciudad = ifelse(data$HEC_DEPTO==1, 1, 0)
+
+data$ciudad
+
+data.frame(1:ncol(data), colnames(data))
+
+arbol <- rpart(ciudad ~ 
+                 VIC_SEXO +
+                 VIC_EDAD +
+                 VIC_TRABAJA +
+                 VIC_DEDICA +
+                 VIC_ESCOLARIDAD,
+               data = data, method = "class"
+               )
+rpart.plot(arbol, type = 2, extra = 0, under = TRUE, fallen.leaves = TRUE, box.palette = "BuGn", main="Ciudad o no", cex=0.8)
+
+```
+
+## Análisis del árbol
+
+Si la persona tiene hasta 4to bachillerato, no es de ciudad, la persona que sufre violencia; si la persona tiene mas de 4to bachillerato y no trabaja, no es de ciudad, pero si tiene mas de 4to bachilllerato y trabaja, sí es del departamento de Guatemala.
+
+Creando una persona:
+
+```{r}
+persona <- data.frame( 
+                 VIC_SEXO = c(1), # Hombre
+                 VIC_EDAD =c(25),
+                 VIC_TRABAJA =c(1), #Sí
+                 VIC_DEDICA =c(3), #Estudiar
+                 VIC_ESCOLARIDAD =c(31)# De primero a tercero básico
+               )
+
+result <- predict(arbol, persona, type="prob" )
+result
+```
+
+Hay un 84% de que esta persona no es del deptp de Ciudad de Guatemala.
+
+### Ahora vamos a ver en que departamento fue la agresión:
+
+```{r}
+arbol_2 <- rpart(HEC_DEPTO ~ 
+                 VIC_SEXO +
+                 VIC_EDAD +
+                 VIC_TRABAJA +
+                 VIC_DEDICA +
+                 VIC_ESCOLARIDAD,
+               data = data, method = "class"
+               )
+rpart.plot(arbol_2, type = 2, extra = 0, under = TRUE, fallen.leaves = TRUE, box.palette = "BuGn", main="Ciudad o no", cex=0.5)
+
+persona <- data.frame( 
+                 VIC_SEXO = c(2), # Mujer
+                 VIC_EDAD =c(25),
+                 VIC_TRABAJA =c(2), #No
+                 VIC_DEDICA =c(3), #Estudiar
+                 VIC_ESCOLARIDAD =c(57)# Primer año a séptimo universitario (Incluye maestría)
+               )
+
+result <- predict(arbol_2, persona, type="prob" )
+result
+
+```
+
+El 48% de este resultado son de la ciudad de Guatemala. Esta información es más pura por los datos pequeños.
+
+### A que se dedica el agresor:
+
+```{r}
+arbol_3 <- rpart(AGR_DEDICA ~ 
+                 VIC_TRABAJA +
+                 VIC_ESCOLARIDAD +
+                   AGR_ESCOLARIDAD +
+                   AGR_TRABAJA,
+               data = data, method = "class"
+               )
+rpart.plot(arbol_3, type = 2, extra = 0, under = TRUE, fallen.leaves = TRUE, box.palette = "BuGn", main="Ciudad o no", cex=0.5)
+
+persona <- data.frame( 
+                 VIC_TRABAJA =c(1), #Sí
+                 VIC_ESCOLARIDAD =c(51), #Primer año a séptimo universitario (Incluye maestría)
+                   AGR_TRABAJA =c(2), #No
+                   AGR_ESCOLARIDAD =c(55) #Primer año a séptimo universitario (Incluye maestría)
+               )
+
+result <- predict(arbol_3, persona, type= "prob")
+result
+```
+
+1 es Quehaceres del hogar, da un 60%
