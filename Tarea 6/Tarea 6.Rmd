@@ -1,0 +1,109 @@
+---
+title: "Tarea 6"
+author: "Linda Morales"
+date: "2025-11-21"
+output: pdf_document
+---
+
+## **HEC_AREA** → Zona donde ocurrió la agresión (urbana o rural)
+
+En esta tarea utilizamos el modelo **Random Forest (Bosque Aleatorio)** para predecir si un caso ocurrió en **zona urbana o rural**, usando características de la víctima y del agresor.
+
+Este método es más robusto que un árbol de decisión individual (como en la Tarea 5), ya que combina múltiples árboles para mejorar la precisión y reducir el sobreajuste.
+
+
+------------------------------------------------------------------------
+
+```{r}
+library(readxl)
+library(randomForest)
+library(rpart)
+library(rpart.plot)
+
+# Cargar datos
+data <- read_excel("/home/linda/Descargas/base-de-datos-violencia-intrafamiliar-ano-2024_v3.xlsx")
+```
+
+```{r}
+# Seleccionar variables relevantes
+
+datar <- data[, c("HEC_AREA", "VIC_SEXO", "VIC_EDAD", "VIC_ESCOLARIDAD",
+"VIC_TRABAJA", "VIC_DEDICA", "AGR_SEXO", "AGR_EDAD",
+"AGR_ESCOLARIDAD", "AGR_TRABAJA")]
+
+# Convertir variable dependiente a factor
+
+datar$HEC_AREA <- as.factor(datar$HEC_AREA)
+
+# Eliminar NA's
+
+datar <- na.omit(datar)
+
+# Reordenar datos aleatoriamente
+
+set.seed(100)
+datar <- datar[sample(1:nrow(datar)), ]
+
+# Dividir en train (80%) y test (20%)
+
+index <- sample(1:nrow(datar), 0.8 * nrow(datar))
+train <- datar[index, ]
+test  <- datar[-index, ]
+
+```
+
+```{r}
+# Entrenar el modelo Random Forest
+
+bosque <- randomForest(
+HEC_AREA ~ VIC_SEXO + VIC_EDAD + VIC_ESCOLARIDAD + VIC_TRABAJA +
+VIC_DEDICA + AGR_SEXO + AGR_EDAD + AGR_ESCOLARIDAD + AGR_TRABAJA,
+data = train,
+ntree = 200,   # Número de árboles
+mtry = 9       # Número de variables probadas en cada división
+)
+
+bosque
+```
+```{r}
+# Predicción en datos de prueba
+
+prueba <- predict(bosque, test)
+
+# Matriz de confusión
+
+matriz <- table(test$HEC_AREA, prueba)
+matriz
+
+# Precisión del modelo
+
+precision <- sum(diag(matriz)) / sum(matriz)
+precision
+
+```
+```{r}
+# Crear una persona ficticia para predecir
+
+persona <- data.frame(
+VIC_SEXO        = 2,   # Mujer
+VIC_EDAD        = 25,
+VIC_ESCOLARIDAD = 40,  # Nivel medio
+VIC_TRABAJA     = 1,   # Sí trabaja
+VIC_DEDICA      = 3,   # Estudia
+AGR_SEXO        = 1,   # Hombre
+AGR_EDAD        = 30,
+AGR_ESCOLARIDAD = 55,  # Universitario
+AGR_TRABAJA     = 1    # Sí trabaja
+)
+
+# Predicción de zona
+
+resultado <- predict(bosque, persona, type = "prob")
+resultado
+
+# Gráfico del modelo
+
+plot(bosque, main = "Error de clasificación del Random Forest")
+
+```
+
