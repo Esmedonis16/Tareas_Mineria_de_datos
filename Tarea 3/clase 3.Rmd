@@ -1,0 +1,187 @@
+---
+title: "Clase 3"
+author: "Linda Morales"
+date: "2025-11-05"
+output:
+  pdf_document:
+    latex_engine: xelatex
+    highlight: tango
+geometry: margin=1in
+header-includes:
+  - \usepackage{fontspec}
+---
+
+## Paquetes
+
+```{r}
+version
+library(fim4r)
+packageVersion("fim4r") ## No funcionó ## 
+```
+
+## Conexión a Spark (motor de cálculo)
+
+### Sparklyr utiliza **Spark MLlib** para ejecutar el algoritmo FP-Growth.
+
+```{r}
+library(sparklyr)
+spark_install(version = "3.5.0")
+sc <- spark_connect(master = "local", version = "3.5.0")
+```
+
+## Importar y preparar los datos
+
+```{r}
+library(readxl)
+library(dplyr)
+
+ruta <- "/home/linda/Descargas/base-de-datos-violencia-intrafamiliar-ano-2024_v3.xlsx"
+
+data <- read_excel(ruta)
+
+datos_tarea7 <- data %>%
+  select(VIC_ESCOLARIDAD, VIC_EST_CIV, VIC_TRABAJA, AGR_TRABAJA, AGR_ESCOLARIDAD, AGR_EST_CIV
+  )
+
+data_fp <- data %>%
+  select(
+    HEC_MES, HEC_DEPTO, VIC_SEXO, 
+    VIC_EDAD, VIC_ESCOLARIDAD, VIC_EST_CIV, VIC_GRUPET, VIC_TRABAJA, VIC_DEDICA
+  )
+
+```
+
+## Discretización de variables numéricas
+
+Si las columnas de edad son numéricas, conviene convertirlas en **rangos** para que FP-Growth las interprete como categorías:
+
+```{r}
+fmt_intervalos <- function(brks) {
+  labs <- sprintf("[%s,%s)", head(brks, -1), tail(brks, -1))
+  labs[length(labs)] <- sprintf("[%s,Inf)", brks[length(brks)-1])
+  labs
+}
+
+disc_edad <- function(x, cortes = c(0, 12, 18, 25, 35, 45, 55, 65)) {
+  cut(as.numeric(x),
+      breaks = c(cortes, Inf),
+      labels = fmt_intervalos(c(cortes, Inf)),
+      include.lowest = TRUE, right = FALSE)
+}
+if (is.numeric(data_fp$VIC_EDAD)) data_fp$VIC_EDAD <- disc_edad(data_fp$VIC_EDAD)
+```
+
+## 5. Conversión a formato de “cestas” (baskets)
+
+El algoritmo FP-Growth espera que cada observación se exprese como un conjunto de ítems (por ejemplo: `sexo=M`, `trabaja=Sí`).
+
+```{r}
+library(purrr)
+library(tibble)
+
+to_baskets <- function(df) {
+  df_chr <- df %>% mutate(across(everything(), as.character))
+  items_list <- map(seq_len(nrow(df_chr)), function(i) {
+    vv <- as.character(df_chr[i, , drop = FALSE][1, ])
+    nn <- names(df_chr)
+    ok <- !is.na(vv) & nzchar(vv)
+    paste(nn[ok], vv[ok], sep = "=")
+  })
+  tibble(id = seq_len(nrow(df_chr)), items = items_list)
+}
+```
+
+Convertimos el conjunto principal:
+
+```{r}
+baskets_all <- to_baskets(data_fp)
+n_trans <- nrow(baskets_all)
+```
+
+# FP-Growth sobre todo el conjunto
+
+Copiamos los datos a Spark y ejecutamos el modelo FP-Growth:
+
+```{r}
+sdf_all <- sdf_copy_to(sc, baskets_all, "baskets_all", overwrite = TRUE)
+
+min_support    <- 0.20
+min_confidence <- 0.50
+
+model_all <- ml_fpgrowth(
+  sdf_all,
+  items_col      = "items",
+  min_support    = min_support,    # porcentaje mínimo de soporte
+  min_confidence = min_confidence  # nivel mínimo de confianza
+)
+
+```
+
+## Reglas y frecuencias generadas
+
+```{r}
+# --- 7) Extraer resultados (con control de errores)
+freq_all  <- tryCatch(ml_freq_itemsets(model_all) %>% collect(), error = function(e) NULL)
+rules_raw <- tryCatch(ml_association_rules(model_all) %>% collect(), error = function(e) NULL)
+
+if (is.null(rules_raw) || nrow(rules_raw) == 0) {
+  cat("No se generaron reglas con estos parámetros.\n")
+  cat("Prueba con min_support = 0.05 o min_confidence = 0.30\n")
+} else {
+  # --- 8) Armar tabla de reglas con texto y conteo
+  lhs_str <- purrr::map_chr(rules_raw$antecedent, ~ paste(.x, collapse = ", "))
+  rhs_str <- purrr::map_chr(rules_raw$consequent, ~ paste(.x, collapse = ", "))
+  rules_df <- tibble::tibble(
+    rules      = paste0("{", lhs_str, "} => {", rhs_str, "}"),
+    support    = rules_raw$support,
+    confidence = rules_raw$confidence,
+    lift       = rules_raw$lift,
+    count      = round(rules_raw$support * n_trans)
+  )
+
+  # --- 9) Top 4 / Top 10 "Mayor impacto Estadístico"
+  top4  <- rules_df %>% arrange(desc(lift), desc(confidence), desc(support)) %>% head(4)
+  top10 <- rules_df %>% arrange(desc(lift), desc(confidence), desc(support)) %>% head(10)
+
+  # --- 10) Resumen estilo fim4r
+  n_items <- baskets_all$items |> unlist(use.names = FALSE) |> unique() |> length()
+  n_rules <- nrow(rules_df)
+
+  cat("Parameter specification:\n")
+  cat(sprintf(" supp conf target report\n %2.0f  %2.0f  rules  scl\n", 100*min_support, 100*min_confidence))
+  cat(sprintf("\nData size: %d transactions and %d items\n", n_trans, n_items))
+  cat(sprintf("Result: %d rules\n\n", n_rules))
+
+  print(top4)
+}
+
+View(rules_df)
+
+#{VIC_EST_CIV=2, VIC_TRABAJA=2, VIC_SEXO=2} => {VIC_DEDICA=1}
+
+#Esto significa que entre las transacciones (casos):
+
+## cuando la persona tiene estado civil = 2,
+
+## no trabaja (2),
+
+## y sexo = 2,
+#entonces con una alta probabilidad (confianza ≈ 97%) también “se dedica = 1”.
+
+
+# --- 11) Cuando termines:
+spark_disconnect(sc)
+
+
+```
+
+Para PDF
+
+```{r}
+install.packages("tinytex")
+tinytex::install_tinytex()
+
+tinytex::is_tinytex()
+
+
+```

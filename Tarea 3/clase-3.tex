@@ -1,0 +1,402 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[
+]{article}
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math} % this also loads fontspec
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else
+  % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\usepackage[utf8]{inputenc}
+\usepackage{newunicodechar}
+\newunicodechar{≈}{\ensuremath{\approx}}
+\usepackage{bookmark}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same}
+\hypersetup{
+  pdftitle={Clase 3},
+  pdfauthor={Linda Morales},
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\title{Clase 3}
+\author{Linda Morales}
+\date{2025-11-05}
+
+\begin{document}
+\maketitle
+
+\subsection{Paquetes}\label{paquetes}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{version}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                _                                
+## platform       x86_64-w64-mingw32               
+## arch           x86_64                           
+## os             mingw32                          
+## crt            ucrt                             
+## system         x86_64, mingw32                  
+## status                                          
+## major          4                                
+## minor          2.3                              
+## year           2023                             
+## month          03                               
+## day            15                               
+## svn rev        83980                            
+## language       R                                
+## version.string R version 4.2.3 (2023-03-15 ucrt)
+## nickname       Shortstop Beagle
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(fim4r)}
+\FunctionTok{packageVersion}\NormalTok{(}\StringTok{"fim4r"}\NormalTok{) }\DocumentationTok{\#\# No funcionó \#\#}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] '1.8'
+\end{verbatim}
+
+\subsection{Conexión a Spark (motor de
+cálculo)}\label{conexiuxf3n-a-spark-motor-de-cuxe1lculo}
+
+\subsubsection{\texorpdfstring{Sparklyr utiliza \textbf{Spark MLlib}
+para ejecutar el algoritmo
+FP-Growth.}{Sparklyr utiliza Spark MLlib para ejecutar el algoritmo FP-Growth.}}\label{sparklyr-utiliza-spark-mllib-para-ejecutar-el-algoritmo-fp-growth.}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(sparklyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'sparklyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:stats':
+## 
+##     filter
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{spark\_install}\NormalTok{(}\AttributeTok{version =} \StringTok{"3.5.0"}\NormalTok{)}
+\NormalTok{sc }\OtherTok{\textless{}{-}} \FunctionTok{spark\_connect}\NormalTok{(}\AttributeTok{master =} \StringTok{"local"}\NormalTok{, }\AttributeTok{version =} \StringTok{"3.5.0"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Importar y preparar los
+datos}\label{importar-y-preparar-los-datos}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(readxl)}
+\FunctionTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{ruta }\OtherTok{\textless{}{-}} \StringTok{"C:/Users/DELL/Downloads/base{-}de{-}datos{-}violencia{-}intrafamiliar{-}ano{-}2024\_v3.xlsx"}
+
+\NormalTok{data }\OtherTok{\textless{}{-}} \FunctionTok{read\_excel}\NormalTok{(ruta)}
+
+\NormalTok{data\_fp }\OtherTok{\textless{}{-}}\NormalTok{ data }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{select}\NormalTok{(}
+\NormalTok{    HEC\_MES, HEC\_DEPTO, VIC\_SEXO, }
+\NormalTok{    VIC\_EDAD, VIC\_ESCOLARIDAD, VIC\_EST\_CIV, VIC\_GRUPET, VIC\_TRABAJA, VIC\_DEDICA}
+\NormalTok{  )}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Discretización de variables
+numéricas}\label{discretizaciuxf3n-de-variables-numuxe9ricas}
+
+Si las columnas de edad son numéricas, conviene convertirlas en
+\textbf{rangos} para que FP-Growth las interprete como categorías:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fmt\_intervalos }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(brks) \{}
+\NormalTok{  labs }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"[\%s,\%s)"}\NormalTok{, }\FunctionTok{head}\NormalTok{(brks, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{), }\FunctionTok{tail}\NormalTok{(brks, }\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{))}
+\NormalTok{  labs[}\FunctionTok{length}\NormalTok{(labs)] }\OtherTok{\textless{}{-}} \FunctionTok{sprintf}\NormalTok{(}\StringTok{"[\%s,Inf)"}\NormalTok{, brks[}\FunctionTok{length}\NormalTok{(brks)}\SpecialCharTok{{-}}\DecValTok{1}\NormalTok{])}
+\NormalTok{  labs}
+\NormalTok{\}}
+
+\NormalTok{disc\_edad }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(x, }\AttributeTok{cortes =} \FunctionTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{, }\DecValTok{12}\NormalTok{, }\DecValTok{18}\NormalTok{, }\DecValTok{25}\NormalTok{, }\DecValTok{35}\NormalTok{, }\DecValTok{45}\NormalTok{, }\DecValTok{55}\NormalTok{, }\DecValTok{65}\NormalTok{)) \{}
+  \FunctionTok{cut}\NormalTok{(}\FunctionTok{as.numeric}\NormalTok{(x),}
+      \AttributeTok{breaks =} \FunctionTok{c}\NormalTok{(cortes, }\ConstantTok{Inf}\NormalTok{),}
+      \AttributeTok{labels =} \FunctionTok{fmt\_intervalos}\NormalTok{(}\FunctionTok{c}\NormalTok{(cortes, }\ConstantTok{Inf}\NormalTok{)),}
+      \AttributeTok{include.lowest =} \ConstantTok{TRUE}\NormalTok{, }\AttributeTok{right =} \ConstantTok{FALSE}\NormalTok{)}
+\NormalTok{\}}
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{is.numeric}\NormalTok{(data\_fp}\SpecialCharTok{$}\NormalTok{VIC\_EDAD)) data\_fp}\SpecialCharTok{$}\NormalTok{VIC\_EDAD }\OtherTok{\textless{}{-}} \FunctionTok{disc\_edad}\NormalTok{(data\_fp}\SpecialCharTok{$}\NormalTok{VIC\_EDAD)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{5. Conversión a formato de ``cestas''
+(baskets)}\label{conversiuxf3n-a-formato-de-cestas-baskets}
+
+El algoritmo FP-Growth espera que cada observación se exprese como un
+conjunto de ítems (por ejemplo: \texttt{sexo=M}, \texttt{trabaja=Sí}).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(purrr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'purrr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following object is masked from 'package:sparklyr':
+## 
+##     invoke
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{library}\NormalTok{(tibble)}
+
+\NormalTok{to\_baskets }\OtherTok{\textless{}{-}} \ControlFlowTok{function}\NormalTok{(df) \{}
+\NormalTok{  df\_chr }\OtherTok{\textless{}{-}}\NormalTok{ df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{mutate}\NormalTok{(}\FunctionTok{across}\NormalTok{(}\FunctionTok{everything}\NormalTok{(), as.character))}
+\NormalTok{  items\_list }\OtherTok{\textless{}{-}} \FunctionTok{map}\NormalTok{(}\FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(df\_chr)), }\ControlFlowTok{function}\NormalTok{(i) \{}
+\NormalTok{    vv }\OtherTok{\textless{}{-}} \FunctionTok{as.character}\NormalTok{(df\_chr[i, , }\AttributeTok{drop =} \ConstantTok{FALSE}\NormalTok{][}\DecValTok{1}\NormalTok{, ])}
+\NormalTok{    nn }\OtherTok{\textless{}{-}} \FunctionTok{names}\NormalTok{(df\_chr)}
+\NormalTok{    ok }\OtherTok{\textless{}{-}} \SpecialCharTok{!}\FunctionTok{is.na}\NormalTok{(vv) }\SpecialCharTok{\&} \FunctionTok{nzchar}\NormalTok{(vv)}
+    \FunctionTok{paste}\NormalTok{(nn[ok], vv[ok], }\AttributeTok{sep =} \StringTok{"="}\NormalTok{)}
+\NormalTok{  \})}
+  \FunctionTok{tibble}\NormalTok{(}\AttributeTok{id =} \FunctionTok{seq\_len}\NormalTok{(}\FunctionTok{nrow}\NormalTok{(df\_chr)), }\AttributeTok{items =}\NormalTok{ items\_list)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+Convertimos el conjunto principal:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{baskets\_all }\OtherTok{\textless{}{-}} \FunctionTok{to\_baskets}\NormalTok{(data\_fp)}
+\NormalTok{n\_trans }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(baskets\_all)}
+\end{Highlighting}
+\end{Shaded}
+
+\section{FP-Growth sobre todo el
+conjunto}\label{fp-growth-sobre-todo-el-conjunto}
+
+Copiamos los datos a Spark y ejecutamos el modelo FP-Growth:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{sdf\_all }\OtherTok{\textless{}{-}} \FunctionTok{sdf\_copy\_to}\NormalTok{(sc, baskets\_all, }\StringTok{"baskets\_all"}\NormalTok{, }\AttributeTok{overwrite =} \ConstantTok{TRUE}\NormalTok{)}
+
+\NormalTok{min\_support    }\OtherTok{\textless{}{-}} \FloatTok{0.20}
+\NormalTok{min\_confidence }\OtherTok{\textless{}{-}} \FloatTok{0.50}
+
+\NormalTok{model\_all }\OtherTok{\textless{}{-}} \FunctionTok{ml\_fpgrowth}\NormalTok{(}
+\NormalTok{  sdf\_all,}
+  \AttributeTok{items\_col      =} \StringTok{"items"}\NormalTok{,}
+  \AttributeTok{min\_support    =}\NormalTok{ min\_support,    }\CommentTok{\# porcentaje mínimo de soporte}
+  \AttributeTok{min\_confidence =}\NormalTok{ min\_confidence  }\CommentTok{\# nivel mínimo de confianza}
+\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{Reglas y frecuencias
+generadas}\label{reglas-y-frecuencias-generadas}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# {-}{-}{-} 7) Extraer resultados (con control de errores)}
+\NormalTok{freq\_all  }\OtherTok{\textless{}{-}} \FunctionTok{tryCatch}\NormalTok{(}\FunctionTok{ml\_freq\_itemsets}\NormalTok{(model\_all) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{collect}\NormalTok{(), }\AttributeTok{error =} \ControlFlowTok{function}\NormalTok{(e) }\ConstantTok{NULL}\NormalTok{)}
+\NormalTok{rules\_raw }\OtherTok{\textless{}{-}} \FunctionTok{tryCatch}\NormalTok{(}\FunctionTok{ml\_association\_rules}\NormalTok{(model\_all) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{collect}\NormalTok{(), }\AttributeTok{error =} \ControlFlowTok{function}\NormalTok{(e) }\ConstantTok{NULL}\NormalTok{)}
+
+\ControlFlowTok{if}\NormalTok{ (}\FunctionTok{is.null}\NormalTok{(rules\_raw) }\SpecialCharTok{||} \FunctionTok{nrow}\NormalTok{(rules\_raw) }\SpecialCharTok{==} \DecValTok{0}\NormalTok{) \{}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"No se generaron reglas con estos parámetros.}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Prueba con min\_support = 0.05 o min\_confidence = 0.30}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+\NormalTok{\} }\ControlFlowTok{else}\NormalTok{ \{}
+  \CommentTok{\# {-}{-}{-} 8) Armar tabla de reglas con texto y conteo}
+\NormalTok{  lhs\_str }\OtherTok{\textless{}{-}}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_chr}\NormalTok{(rules\_raw}\SpecialCharTok{$}\NormalTok{antecedent, }\SpecialCharTok{\textasciitilde{}} \FunctionTok{paste}\NormalTok{(.x, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{))}
+\NormalTok{  rhs\_str }\OtherTok{\textless{}{-}}\NormalTok{ purrr}\SpecialCharTok{::}\FunctionTok{map\_chr}\NormalTok{(rules\_raw}\SpecialCharTok{$}\NormalTok{consequent, }\SpecialCharTok{\textasciitilde{}} \FunctionTok{paste}\NormalTok{(.x, }\AttributeTok{collapse =} \StringTok{", "}\NormalTok{))}
+\NormalTok{  rules\_df }\OtherTok{\textless{}{-}}\NormalTok{ tibble}\SpecialCharTok{::}\FunctionTok{tibble}\NormalTok{(}
+    \AttributeTok{rules      =} \FunctionTok{paste0}\NormalTok{(}\StringTok{"\{"}\NormalTok{, lhs\_str, }\StringTok{"\} =\textgreater{} \{"}\NormalTok{, rhs\_str, }\StringTok{"\}"}\NormalTok{),}
+    \AttributeTok{support    =}\NormalTok{ rules\_raw}\SpecialCharTok{$}\NormalTok{support,}
+    \AttributeTok{confidence =}\NormalTok{ rules\_raw}\SpecialCharTok{$}\NormalTok{confidence,}
+    \AttributeTok{lift       =}\NormalTok{ rules\_raw}\SpecialCharTok{$}\NormalTok{lift,}
+    \AttributeTok{count      =} \FunctionTok{round}\NormalTok{(rules\_raw}\SpecialCharTok{$}\NormalTok{support }\SpecialCharTok{*}\NormalTok{ n\_trans)}
+\NormalTok{  )}
+
+  \CommentTok{\# {-}{-}{-} 9) Top 4 / Top 10 "Mayor impacto Estadístico"}
+\NormalTok{  top4  }\OtherTok{\textless{}{-}}\NormalTok{ rules\_df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(lift), }\FunctionTok{desc}\NormalTok{(confidence), }\FunctionTok{desc}\NormalTok{(support)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{head}\NormalTok{(}\DecValTok{4}\NormalTok{)}
+\NormalTok{  top10 }\OtherTok{\textless{}{-}}\NormalTok{ rules\_df }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{arrange}\NormalTok{(}\FunctionTok{desc}\NormalTok{(lift), }\FunctionTok{desc}\NormalTok{(confidence), }\FunctionTok{desc}\NormalTok{(support)) }\SpecialCharTok{\%\textgreater{}\%} \FunctionTok{head}\NormalTok{(}\DecValTok{10}\NormalTok{)}
+
+  \CommentTok{\# {-}{-}{-} 10) Resumen estilo fim4r}
+\NormalTok{  n\_items }\OtherTok{\textless{}{-}}\NormalTok{ baskets\_all}\SpecialCharTok{$}\NormalTok{items }\SpecialCharTok{|\textgreater{}} \FunctionTok{unlist}\NormalTok{(}\AttributeTok{use.names =} \ConstantTok{FALSE}\NormalTok{) }\SpecialCharTok{|\textgreater{}} \FunctionTok{unique}\NormalTok{() }\SpecialCharTok{|\textgreater{}} \FunctionTok{length}\NormalTok{()}
+\NormalTok{  n\_rules }\OtherTok{\textless{}{-}} \FunctionTok{nrow}\NormalTok{(rules\_df)}
+
+  \FunctionTok{cat}\NormalTok{(}\StringTok{"Parameter specification:}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{)}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{" supp conf target report}\SpecialCharTok{\textbackslash{}n}\StringTok{ \%2.0f  \%2.0f  rules  scl}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, }\DecValTok{100}\SpecialCharTok{*}\NormalTok{min\_support, }\DecValTok{100}\SpecialCharTok{*}\NormalTok{min\_confidence))}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"}\SpecialCharTok{\textbackslash{}n}\StringTok{Data size: \%d transactions and \%d items}\SpecialCharTok{\textbackslash{}n}\StringTok{"}\NormalTok{, n\_trans, n\_items))}
+  \FunctionTok{cat}\NormalTok{(}\FunctionTok{sprintf}\NormalTok{(}\StringTok{"Result: \%d rules}\SpecialCharTok{\textbackslash{}n\textbackslash{}n}\StringTok{"}\NormalTok{, n\_rules))}
+
+  \FunctionTok{print}\NormalTok{(top4)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Parameter specification:
+##  supp conf target report
+##  20  50  rules  scl
+## 
+## Data size: 36609 transactions and 94 items
+## Result: 46 rules
+## 
+## # A tibble: 4 x 5
+##   rules                                           support confidence  lift count
+##   <chr>                                             <dbl>      <dbl> <dbl> <dbl>
+## 1 {VIC_EST_CIV=2, VIC_TRABAJA=2, VIC_SEXO=2} => ~   0.202      0.970  1.77  7393
+## 2 {VIC_TRABAJA=2, VIC_SEXO=2} => {VIC_DEDICA=1}     0.547      0.944  1.72 20019
+## 3 {VIC_EST_CIV=2, VIC_TRABAJA=2} => {VIC_DEDICA=~   0.203      0.942  1.72  7415
+## 4 {VIC_GRUPET=1, VIC_TRABAJA=2, VIC_SEXO=2} => {~   0.280      0.926  1.69 10243
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{View}\NormalTok{(rules\_df)}
+
+\CommentTok{\#\{VIC\_EST\_CIV=2, VIC\_TRABAJA=2, VIC\_SEXO=2\} =\textgreater{} \{VIC\_DEDICA=1\}}
+
+\CommentTok{\#Esto significa que entre las transacciones (casos):}
+
+\DocumentationTok{\#\# cuando la persona tiene estado civil = 2,}
+
+\DocumentationTok{\#\# no trabaja (2),}
+
+\DocumentationTok{\#\# y sexo = 2,}
+\CommentTok{\#entonces con una alta probabilidad (confianza ≈ 97\%) también “se dedica = 1”.}
+
+
+\CommentTok{\# {-}{-}{-} 11) Cuando termines:}
+\FunctionTok{spark\_disconnect}\NormalTok{(sc)}
+\end{Highlighting}
+\end{Shaded}
+
+
+\end{document}
